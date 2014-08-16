@@ -12,6 +12,7 @@ class PDFReference
     @compress = @document.compress and not @data.Filter
     @uncompressedLength = 0
     @chunks = []
+    @chunksToCompress = [];
     
   initDeflate: ->
     @data.Filter = 'FlateDecode'
@@ -32,7 +33,7 @@ class PDFReference
     
     if @compress
       @initDeflate() if not @deflate
-      @deflate.write chunk
+      @chunksToCompress.push(chunk);
     else
       @chunks.push chunk
       @data.Length += chunk.length
@@ -42,6 +43,7 @@ class PDFReference
       @write chunk
     
     if @deflate
+      @deflate.write(Buffer.concat(@chunksToCompress));
       @deflate.end()
     else
       @finalize()
