@@ -32,7 +32,8 @@ class PDFReference
     
     if @compress
       @initDeflate() if not @deflate
-      @deflate.write chunk
+      unless @deflate.write chunk
+        @document.emit('streamNeedsDrain', @deflate);
     else
       @chunks.push chunk
       @data.Length += chunk.length
